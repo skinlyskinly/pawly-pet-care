@@ -10,7 +10,7 @@
   const titles = {
     home:    "나비의 하루",
     emotion: "감정 분석",
-    gesture: "제스처 교감",
+    cat:     "나비의 지금 모습",
     care:    "AI 맞춤 케어",
   };
   function switchView(view) {
@@ -127,111 +127,56 @@
     );
   }
 
-  /* ---------- 제스처 가이드 ---------- */
-  function renderGuide() {
-    $("#guideGrid").innerHTML = Object.entries(D.gestureMap)
+  /* =========================================================
+     나비 상태 애니메이션 (감정·건강에 따라 모습 변화)
+     ========================================================= */
+  const stage      = $("#catStage");
+  const moodEmoji  = $("#catMoodEmoji");
+  const moodLabel  = $("#catMoodLabel");
+  const catDesc    = $("#catDesc");
+  const picker     = $("#statePicker");
+  const alertBox   = $("#catAlert");
+
+  const STATE_KEYS = D.catStates.map((s) => s.key);
+
+  function renderStatePicker() {
+    picker.innerHTML = D.catStates
       .map(
-        ([key, g]) => `
-        <div class="guide-item" data-gesture="${key}">
-          <span class="g-emoji">${g.emoji}</span>
-          <div class="g-meta"><strong>${g.name}</strong><span>${g.desc}</span></div>
-        </div>`
+        (s) => `
+        <button class="state-chip" data-state="${s.key}" title="${s.label}">
+          <span>${s.emoji}</span><small>${s.label}</small>
+        </button>`
       )
       .join("");
-  }
-
-  /* =========================================================
-     제스처 교감 로직
-     ========================================================= */
-  const camBtn      = $("#camBtn");
-  const camStatus   = $("#camStatus");
-  const placeholder = $("#camPlaceholder");
-  const badge       = $("#gestureBadge");
-  const badgeIco    = $("#gestureBadgeIco");
-  const badgeText   = $("#gestureBadgeText");
-  const petFace     = $("#petFace");
-  const petReaction = $("#petReaction");
-
-  let currentGesture = null;   // 디바운스용
-  let stableSince    = 0;
-  const HOLD_MS = 350;         // 같은 제스처가 이만큼 유지되면 반응
-
-  const G = window.PawlyGesture;
-
-  // 모델/카메라 상태 표시
-  G.onStatus = (txt) => { camStatus.textContent = txt; };
-  G.onError  = () => { camBtn.disabled = false; camBtn.textContent = "다시 시도"; };
-
-  // 인식 결과 처리
-  G.onResult = (gestureKey, conf) => {
-    if (!gestureKey) {
-      badge.hidden = true;
-      currentGesture = null;
-      highlightGuide(null);
-      return;
-    }
-    const info = D.gestureMap[gestureKey];
-    if (!info) return;
-
-    // 상단 배지 + 가이드 하이라이트는 즉시 반영
-    badge.hidden = false;
-    badgeIco.textContent  = info.emoji;
-    badgeText.textContent = `${info.name} · ${Math.round(conf * 100)}%`;
-    highlightGuide(gestureKey);
-
-    // 같은 제스처가 일정시간 유지되면 펫 반응 트리거 (떨림 방지)
-    const now = performance.now();
-    if (gestureKey !== currentGesture) {
-      currentGesture = gestureKey;
-      stableSince = now;
-      return;
-    }
-    if (now - stableSince > HOLD_MS && petFace.dataset.last !== gestureKey) {
-      petFace.dataset.last = gestureKey;
-      reactPet(info);
-    }
-  };
-
-  function reactPet(info) {
-    petFace.textContent = info.face;
-    petReaction.textContent = info.reaction;
-    petFace.classList.remove("react");
-    void petFace.offsetWidth;       // reflow 로 애니메이션 재시작
-    petFace.classList.add("react");
-  }
-
-  function highlightGuide(key) {
-    $$(".guide-item").forEach((el) =>
-      el.classList.toggle("lit", el.dataset.gesture === key)
+    $$(".state-chip", picker).forEach((b) =>
+      b.addEventListener("click", () => setCatState(b.dataset.state))
     );
   }
 
-  // 카메라 토글 버튼
-  camBtn.addEventListener("click", async () => {
-    if (G.isRunning()) {
-      G.stop();
-      camBtn.textContent = "카메라 켜기";
-      camBtn.classList.remove("is-stop");
-      placeholder.style.display = "flex";
-      badge.hidden = true;
-      petFace.dataset.last = "";
-      highlightGuide(null);
-      petReaction.textContent = "손동작을 기다리고 있어요…";
-      petFace.textContent = "🐱";
-      return;
-    }
-    camBtn.disabled = true;
-    camBtn.textContent = "준비 중…";
-    placeholder.style.display = "none";
-    await G.start();
-    camBtn.disabled = false;
-    if (G.isRunning()) {
-      camBtn.textContent = "카메라 끄기";
-      camBtn.classList.add("is-stop");
-    } else {
-      placeholder.style.display = "flex";
-    }
-  });
+  function setCatState(key) {
+    const s = D.catStates.find((x) => x.key === key);
+    if (!s) return;
+
+    // 상태 클래스 교체 → CSS 가 표정·애니메이션을 전환
+    STATE_KEYS.forEach((k) => stage.classList.remove("state-" + k));
+    stage.classList.add("state-" + key);
+
+    moodEmoji.textContent = s.emoji;
+    moodLabel.textContent = s.label;
+    catDesc.textContent   = s.desc;
+
+    alertBox.className = "cat-alert tone-" + s.alert.tone;
+    alertBox.innerHTML = `<span class="alert-ico">${s.alert.ico}</span><p>${s.alert.text}</p>`;
+
+    $$(".state-chip", picker).forEach((b) =>
+      b.classList.toggle("is-active", b.dataset.state === key)
+    );
+
+    // 전환 시 살짝 튀어오르는 모션
+    stage.classList.remove("switching");
+    void stage.offsetWidth;
+    stage.classList.add("switching");
+  }
 
   /* ---------- 초기 렌더 ---------- */
   renderChart();
@@ -241,5 +186,6 @@
   renderInsights();
   renderCare();
   renderChecklist();
-  renderGuide();
+  renderStatePicker();
+  setCatState(D.defaultState || "calm");
 })();

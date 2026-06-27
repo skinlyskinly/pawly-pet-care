@@ -26,8 +26,8 @@
         <button class="nav-item" data-view="emotion">
           <span class="nav-ico">💞</span><span>감정 분석</span>
         </button>
-        <button class="nav-item" data-view="gesture">
-          <span class="nav-ico">✋</span><span>제스처 교감</span>
+        <button class="nav-item" data-view="cat">
+          <span class="nav-ico">🐾</span><span>나비 상태</span>
         </button>
         <button class="nav-item" data-view="care">
           <span class="nav-ico">🤖</span><span>AI 케어</span>
@@ -146,44 +146,110 @@
         </div>
       </section>
 
-      <!-- ============ GESTURE ============ -->
-      <section class="view" id="view-gesture">
-        <div class="grid-2 gesture-grid">
-          <div class="card cam-card">
-            <div class="card-head">
-              <h3>손동작 교감</h3>
-              <span class="chip chip-mint">MediaPipe AI</span>
-            </div>
-            <p class="muted-sm">카메라 앞에서 손동작을 보여주세요. AI가 인식해 나비가 반응해요.</p>
-            <div class="cam-wrap">
-              <video id="cam" autoplay playsinline muted></video>
-              <canvas id="overlay"></canvas>
-              <div class="cam-placeholder" id="camPlaceholder">
-                <span class="cam-ico">📷</span>
-                <p>카메라를 켜고 손동작을 시작하세요</p>
-              </div>
-              <div class="cam-badge" id="gestureBadge" hidden>
-                <span id="gestureBadgeIco">✋</span>
-                <span id="gestureBadgeText">손동작 대기 중</span>
-              </div>
-            </div>
-            <div class="cam-controls">
-              <button class="btn btn-primary" id="camBtn">카메라 켜기</button>
-              <span class="cam-status" id="camStatus">대기 중</span>
+      <!-- ============ CAT STATE ============ -->
+      <section class="view" id="view-cat">
+        <div class="card cat-card">
+          <div class="card-head">
+            <h3>나비의 지금 모습</h3>
+            <span class="chip chip-mint">감정 · 건강 실시간</span>
+          </div>
+          <p class="muted-sm">AI가 분석한 감정·건강 상태에 따라 나비의 모습이 실시간으로 바뀌어요. 상태를 눌러 미리 볼 수도 있어요.</p>
+
+          <div class="cat-stage state-calm" id="catStage">
+            <svg class="cat-svg" viewBox="0 0 260 248" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="나비 상태 애니메이션">
+              <ellipse class="cat-shadow" cx="130" cy="232" rx="66" ry="12"/>
+
+              <!-- tail -->
+              <path id="catTail" class="fur" d="M184 196 q46 6 42 -40 q-5 -32 -28 -29 q23 7 19 31 q-5 27 -35 23 z"/>
+
+              <!-- body -->
+              <g id="catBody">
+                <ellipse class="fur" cx="130" cy="182" rx="60" ry="52"/>
+                <ellipse class="belly" cx="130" cy="194" rx="35" ry="34"/>
+                <ellipse class="fur" cx="104" cy="222" rx="17" ry="11"/>
+                <ellipse class="fur" cx="156" cy="222" rx="17" ry="11"/>
+                <path class="paw-line" d="M104 218 v8 M156 218 v8"/>
+              </g>
+
+              <!-- head -->
+              <g id="catHead">
+                <path id="earL" class="fur" d="M86 80 L72 36 L116 66 Z"/>
+                <path id="earR" class="fur" d="M174 80 L188 36 L144 66 Z"/>
+                <path class="ear-in" d="M90 74 L82 48 L110 66 Z"/>
+                <path class="ear-in" d="M170 74 L178 48 L150 66 Z"/>
+
+                <circle class="fur" cx="130" cy="110" r="55"/>
+                <circle class="blush" cx="95" cy="122" r="11"/>
+                <circle class="blush" cx="165" cy="122" r="11"/>
+
+                <!-- eyes: 3 variants toggled per state -->
+                <g class="eyes eyes-open">
+                  <ellipse class="eye-white" cx="110" cy="108" rx="11" ry="13"/>
+                  <ellipse class="eye-white" cx="150" cy="108" rx="11" ry="13"/>
+                  <circle class="pupil" cx="110" cy="110" r="6"/>
+                  <circle class="pupil" cx="150" cy="110" r="6"/>
+                  <circle class="glint" cx="112" cy="106" r="2.2"/>
+                  <circle class="glint" cx="152" cy="106" r="2.2"/>
+                </g>
+                <g class="eyes eyes-happy">
+                  <path d="M99 110 q11 -13 22 0"/>
+                  <path d="M139 110 q11 -13 22 0"/>
+                </g>
+                <g class="eyes eyes-closed">
+                  <path d="M99 110 q11 11 22 0"/>
+                  <path d="M139 110 q11 11 22 0"/>
+                </g>
+
+                <g class="brows-sad">
+                  <path d="M99 92 q11 5 20 1"/>
+                  <path d="M141 93 q9 -4 20 -1"/>
+                </g>
+
+                <path class="nose" d="M123 128 h14 l-7 8 z"/>
+                <g class="mouth mouth-smile"><path d="M130 136 q-9 9 -17 3 M130 136 q9 9 17 3"/></g>
+                <g class="mouth mouth-sad"><path d="M113 146 q17 -11 34 0"/></g>
+                <g class="mouth mouth-o"><ellipse cx="130" cy="143" rx="5.5" ry="6.5"/></g>
+
+                <g class="whiskers"><path d="M83 118 l-31 -7 M83 126 l-33 2 M177 118 l31 -7 M177 126 l33 2"/></g>
+              </g>
+
+              <!-- mood FX -->
+              <g class="fx fx-hearts">
+                <path class="heart" d="M42 74 c-5 -7 -16 -2 -11 7 c3 6 11 10 11 10 c0 0 8 -4 11 -10 c5 -9 -6 -14 -11 -7 z"/>
+                <path class="heart h2" d="M216 64 c-4 -6 -13 -2 -9 6 c2 5 9 8 9 8 c0 0 7 -3 9 -8 c4 -8 -5 -12 -9 -6 z"/>
+              </g>
+              <g class="fx fx-zzz">
+                <text x="180" y="66" class="zz z1">z</text>
+                <text x="200" y="50" class="zz z2">Z</text>
+              </g>
+              <g class="fx fx-sick">
+                <rect x="106" y="42" width="48" height="22" rx="9" class="icepack"/>
+                <path class="icepack-line" d="M122 42 v22 M134 42 v22 M146 42 v22"/>
+                <path class="sweat" d="M182 98 q5 9 0 13 q-5 -4 0 -13 z"/>
+              </g>
+              <g class="fx fx-alert">
+                <path class="bang" d="M213 54 l3 -24 h-9 l3 24 z"/>
+                <circle class="bang" cx="211.5" cy="63" r="3.6"/>
+              </g>
+              <g class="fx fx-lonely">
+                <path class="tear" d="M150 122 q5 10 0 15 q-5 -5 0 -15 z"/>
+              </g>
+            </svg>
+
+            <div class="cat-mood">
+              <span id="catMoodEmoji">😊</span>
+              <strong id="catMoodLabel">편안해요</strong>
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-head"><h3>나비의 반응</h3></div>
-            <div class="pet-reaction">
-              <div class="pet-reaction-face" id="petFace">🐱</div>
-              <p class="pet-reaction-text" id="petReaction">손동작을 기다리고 있어요…</p>
-            </div>
-            <div class="gesture-guide">
-              <p class="guide-title">인식 가능한 손동작</p>
-              <div class="guide-grid" id="guideGrid"></div>
-            </div>
-          </div>
+          <p class="cat-desc" id="catDesc"></p>
+
+          <div class="state-picker" id="statePicker"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>상태 알림</h3></div>
+          <div class="cat-alert" id="catAlert"></div>
         </div>
       </section>
 
@@ -208,12 +274,11 @@
   <nav class="mobile-nav" aria-label="모바일 메뉴">
     <button class="m-nav is-active" data-view="home"><span>🏠</span><small>홈</small></button>
     <button class="m-nav" data-view="emotion"><span>💞</span><small>감정</small></button>
-    <button class="m-nav" data-view="gesture"><span>✋</span><small>교감</small></button>
+    <button class="m-nav" data-view="cat"><span>🐾</span><small>상태</small></button>
     <button class="m-nav" data-view="care"><span>🤖</span><small>케어</small></button>
   </nav>
 
   <script src="js/data.js"></script>
-  <script type="module" src="js/gesture.js"></script>
-  <script type="module" src="js/app.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

@@ -64,14 +64,27 @@ window.PAWLY = {
     { text: "저녁 사료 급여", done: false },
   ],
 
-  /* ----- 손동작 → 반려동물 반응 매핑 -----
-     key 는 MediaPipe GestureRecognizer 의 기본 카테고리명과 일치 */
-  gestureMap: {
-    Thumb_Up:    { emoji: "👍", name: "칭찬", desc: "잘했어 신호", face: "😻", reaction: "기분이 좋아 골골송을 부르며 비벼요!" },
-    Open_Palm:   { emoji: "✋", name: "이리와", desc: "부르기",     face: "🐱", reaction: "꼬리를 세우고 천천히 다가와요." },
-    Victory:     { emoji: "✌️", name: "놀이",  desc: "놀이 모드",   face: "😼", reaction: "동공이 커지고 사냥 자세를 잡아요!" },
-    Closed_Fist: { emoji: "✊", name: "기다려", desc: "진정/대기",   face: "😌", reaction: "식빵 자세로 얌전히 기다려요." },
-    Pointing_Up: { emoji: "☝️", name: "주목",  desc: "집중시키기",  face: "👀", reaction: "귀를 쫑긋 세우고 손끝을 응시해요." },
-    ILoveYou:    { emoji: "🤟", name: "사랑해", desc: "애정 표현",   face: "😽", reaction: "천천히 눈을 깜빡이며 눈인사를 보내요!" },
-  },
+  /* ----- 감정·건강 상태별 나비의 모습 -----
+     key 는 .cat-stage 의 상태 클래스(state-<key>)와 일치 */
+  defaultState: "calm",
+  catStates: [
+    { key: "calm",   emoji: "😊", label: "편안해요",
+      desc: "나비는 지금 안정적이에요. 수염과 귀가 부드럽게 풀려 있고 호흡이 일정해요.",
+      alert: { tone: "ok",   ico: "✅", text: "특별한 이상 신호가 없어요. 지금처럼 케어를 유지해 주세요." } },
+    { key: "happy",  emoji: "😻", label: "행복해요",
+      desc: "골골송을 부르며 기분이 아주 좋아요. 보호자와의 교감으로 애정 호르몬이 올라간 상태예요.",
+      alert: { tone: "ok",   ico: "💖", text: "교감이 잘 되고 있어요. 짧은 놀이로 마무리하면 더 좋아요." } },
+    { key: "sleepy", emoji: "😴", label: "졸려요",
+      desc: "눈을 감고 식빵 자세로 휴식 중이에요. 깊은 수면으로 체력을 회복하고 있어요.",
+      alert: { tone: "ok",   ico: "🌙", text: "수면을 방해하지 않도록 조용한 환경을 유지해 주세요." } },
+    { key: "alert",  emoji: "😼", label: "경계 중",
+      desc: "귀를 세우고 동공이 커졌어요. 낯선 소리나 환경 변화에 긴장하고 있어요.",
+      alert: { tone: "warn", ico: "⚠️", text: "스트레스 신호예요. 자극을 줄이고 숨을 곳을 마련해 주세요." } },
+    { key: "lonely", emoji: "🥺", label: "외로워요",
+      desc: "혼자 있는 시간이 길어 활력이 떨어졌어요. 보호자를 찾는 울음이 늘었어요.",
+      alert: { tone: "warn", ico: "🧶", text: "교감 시간을 늘리고 자동 급식기·장난감으로 외로움을 달래주세요." } },
+    { key: "sick",   emoji: "🤕", label: "아파요",
+      desc: "활동량과 식욕이 평소보다 크게 줄었어요. 몸을 웅크리고 그루밍을 거의 하지 않아요.",
+      alert: { tone: "bad",  ico: "🏥", text: "건강 이상 신호가 감지됐어요. 가까운 시일 내 수의사 상담을 권장해요." } },
+  ],
 };

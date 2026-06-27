@@ -234,61 +234,177 @@ body {
 .timeline .tl-dot span { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--blue-soft); font-size: 14px; }
 .timeline .tl-text { font-size: 13.5px; color: var(--ink-soft); padding-top: 3px; }
 
-/* ---------- Gesture / camera ---------- */
-.gesture-grid { align-items: start; }
-.cam-wrap {
-  position: relative; aspect-ratio: 4/3; width: 100%;
-  background: #0E1726; border-radius: var(--radius-lg); overflow: hidden;
+/* =========================================================
+   나비 상태 애니메이션
+   ========================================================= */
+.cat-stage {
+  position: relative;
+  background: linear-gradient(160deg, var(--mint-soft) 0%, var(--blue-soft) 120%);
+  border-radius: var(--radius-lg);
+  padding: 26px 16px 18px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  overflow: hidden;
 }
-#cam, #overlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-#cam { background: #0E1726; }
-.cam-placeholder {
-  position: absolute; inset: 0; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 8px; color: #9FB0C8;
-}
-.cam-placeholder .cam-ico { font-size: 38px; }
-.cam-placeholder p { font-size: 13.5px; }
-.cam-badge {
-  position: absolute; left: 14px; bottom: 14px;
+.cat-stage.switching .cat-svg { animation: stageHop .45s ease; }
+@keyframes stageHop { 0%{transform:translateY(0)} 35%{transform:translateY(-12px)} 100%{transform:translateY(0)} }
+
+.cat-svg { width: 250px; max-width: 78%; height: auto; display: block; overflow: visible; }
+
+.cat-mood {
   display: flex; align-items: center; gap: 9px;
-  background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
-  padding: 9px 15px; border-radius: 999px; font-weight: 600; font-size: 14px;
-  box-shadow: var(--shadow-md);
+  background: rgba(255,255,255,.85); backdrop-filter: blur(6px);
+  padding: 8px 18px; border-radius: 999px; box-shadow: var(--shadow-sm);
 }
-.cam-badge span:first-child { font-size: 18px; }
-.cam-controls { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
-.cam-status { font-size: 13px; color: var(--ink-mute); }
+.cat-mood span { font-size: 20px; }
+.cat-mood strong { font-size: 15px; letter-spacing: -.01em; }
 
-.btn {
-  border: none; cursor: pointer; font: 600 14.5px var(--font);
-  padding: 12px 22px; border-radius: var(--radius-md); transition: .18s ease;
+.cat-desc {
+  font-size: 14.5px; color: var(--ink-soft); text-align: center;
+  margin: 16px auto 4px; max-width: 460px; min-height: 42px;
 }
-.btn-primary { background: var(--blue); color: #fff; box-shadow: var(--shadow-sm); }
-.btn-primary:hover { background: #3C7FD0; transform: translateY(-1px); }
-.btn-primary:disabled { opacity: .55; cursor: default; transform: none; }
-.btn.is-stop { background: #F0F4F9; color: var(--ink-soft); }
 
-/* ---------- Pet reaction ---------- */
-.pet-reaction { text-align: center; padding: 18px 0 24px; }
-.pet-reaction-face {
-  font-size: 78px; line-height: 1; display: inline-block;
-  transition: transform .3s ease;
+/* ----- state picker ----- */
+.state-picker {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 9px;
+  margin-top: 14px;
 }
-.pet-reaction-face.react { animation: pop .5s ease; }
-@keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.22) rotate(-6deg)} 100%{transform:scale(1)} }
-.pet-reaction-text { margin-top: 14px; font-size: 15px; color: var(--ink-soft); font-weight: 500; }
+.state-chip {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 12px 6px; cursor: pointer;
+  background: var(--surface-2); border: 1.5px solid var(--line);
+  border-radius: var(--radius-md); transition: .16s ease;
+  font: 500 11.5px var(--font); color: var(--ink-soft);
+}
+.state-chip span { font-size: 22px; }
+.state-chip:hover { border-color: var(--blue); transform: translateY(-2px); }
+.state-chip.is-active { border-color: var(--mint); background: var(--mint-soft); color: #1F9C84; font-weight: 600; }
 
-.gesture-guide { border-top: 1px solid var(--line); padding-top: 18px; }
-.guide-title { font-size: 13px; color: var(--ink-mute); margin-bottom: 12px; font-weight: 600; }
-.guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.guide-item {
-  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-md);
+/* ----- alert box ----- */
+.cat-alert { display: flex; align-items: center; gap: 13px; padding: 16px 18px; border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--surface-2); }
+.cat-alert .alert-ico { font-size: 22px; flex-shrink: 0; }
+.cat-alert p { font-size: 14px; color: var(--ink-soft); }
+.cat-alert.tone-ok   { background: var(--mint-soft); border-color: #BCEBE0; }
+.cat-alert.tone-warn { background: #FFF6E6; border-color: #FAE2B0; }
+.cat-alert.tone-bad  { background: #FDECEC; border-color: #F6C9C9; }
+.cat-alert.tone-bad p { color: #C0473F; font-weight: 500; }
+
+/* =========================================================
+   SVG 고양이 — 파츠 색상
+   ========================================================= */
+.cat-shadow { fill: rgba(54,94,150,.10); }
+.fur        { fill: #B9C6DA; }
+.belly      { fill: #EAF1F9; }
+.ear-in     { fill: #F2C7CF; }
+.blush      { fill: #F7C9D2; opacity: .65; }
+.eye-white  { fill: #FFFFFF; }
+.pupil      { fill: #22324F; transition: r .25s ease; }
+.glint      { fill: #FFFFFF; }
+.nose       { fill: #E58FA0; }
+.paw-line   { stroke: #9DAAC2; stroke-width: 2; stroke-linecap: round; fill: none; }
+.whiskers path { stroke: #C5D0E0; stroke-width: 2; stroke-linecap: round; fill: none; }
+.eyes-happy path, .eyes-closed path { fill: none; stroke: #22324F; stroke-width: 4; stroke-linecap: round; }
+.brows-sad path { fill: none; stroke: #5A6B85; stroke-width: 3; stroke-linecap: round; }
+.mouth path, .mouth ellipse { fill: none; stroke: #5A6B85; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.mouth-o ellipse { fill: #E58FA0; stroke: none; }
+.heart  { fill: #F38FA3; }
+.tear   { fill: #7FB6F0; }
+.zz     { fill: #9AA8C0; font: 700 18px var(--font); }
+.zz.z2  { font-size: 24px; }
+.icepack { fill: #C3E6FB; stroke: #8FCDF2; stroke-width: 2; }
+.icepack-line { stroke: #8FCDF2; stroke-width: 2; }
+.sweat  { fill: #9FD0F5; }
+.bang   { fill: #F0A93C; }
+
+/* transform 기준점 (퍼센트 origin 을 위해 fill-box) */
+#catBody, #catTail, #catHead, #earL, #earR, .eyes-open,
+.fx-hearts .heart, .fx-zzz .zz, .fx-sick .sweat, .fx-alert .bang { transform-box: fill-box; }
+#catBody { transform-origin: center bottom; }
+#catTail { transform-origin: 8px 90%; }
+#catHead { transform-origin: center bottom; }
+#earL, #earR { transform-origin: center bottom; }
+.eyes-open { transform-origin: center; }
+
+/* 항상 살아있는 모션: 호흡·꼬리·눈깜빡임 */
+#catBody { animation: breathe 3.8s ease-in-out infinite; }
+#catTail { animation: tailSway 3.2s ease-in-out infinite; }
+.eyes-open { animation: blink 4.2s infinite; }
+@keyframes breathe { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(1.035) scaleX(1.01)} }
+@keyframes tailSway { 0%,100%{transform:rotate(-7deg)} 50%{transform:rotate(8deg)} }
+@keyframes blink { 0%,92%,100%{transform:scaleY(1)} 96%{transform:scaleY(.1)} }
+
+/* 기본 표시 규칙: 어떤 상태 클래스도 없으면 평온한 얼굴 */
+.eyes-happy, .eyes-closed, .brows-sad,
+.mouth-sad, .mouth-o, .fx { display: none; }
+.eyes-open, .mouth-smile { display: block; }
+
+/* ---------- 편안(calm) ---------- */
+.state-calm .eyes-open  { display: block; }
+
+/* ---------- 행복(happy) ---------- */
+.state-happy .eyes-open  { display: none; }
+.state-happy .eyes-happy { display: block; }
+.state-happy .fx-hearts  { display: block; }
+.state-happy #catTail    { animation-duration: 1.4s; }
+.state-happy #catBody    { animation: breathe 1.5s ease-in-out infinite; }
+.fx-hearts .heart  { animation: floatUp 2.4s ease-in infinite; }
+.fx-hearts .heart.h2 { animation-delay: 1.1s; }
+@keyframes floatUp { 0%{opacity:0; transform:translateY(6px) scale(.8)} 25%{opacity:1} 100%{opacity:0; transform:translateY(-26px) scale(1.1)} }
+
+/* ---------- 졸림(sleepy) ---------- */
+.state-sleepy .eyes-open   { display: none; }
+.state-sleepy .eyes-closed { display: block; }
+.state-sleepy .fx-zzz      { display: block; }
+.state-sleepy #catBody     { animation: breathe 5.5s ease-in-out infinite; }
+.state-sleepy #catHead     { transform: rotate(-5deg); }
+.fx-zzz .zz { animation: floatUp 3s ease-in infinite; }
+.fx-zzz .z2 { animation-delay: 1.4s; }
+
+/* ---------- 경계(alert) ---------- */
+.state-alert .eyes-open  { display: block; animation: none; }
+.state-alert .pupil      { r: 8.5; }
+.state-alert .mouth-smile { display: none; }
+.state-alert .mouth-o    { display: block; }
+.state-alert .fx-alert   { display: block; }
+.state-alert #earL       { transform: rotate(-12deg); }
+.state-alert #earR       { transform: rotate(12deg); }
+.state-alert #catHead    { animation: shake .22s ease-in-out infinite; }
+.state-alert #catTail    { animation-duration: .6s; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-3px)} 75%{transform:translateX(3px)} }
+.fx-alert .bang { animation: pulse .7s ease-in-out infinite; transform-origin: center bottom; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.18)} }
+
+/* ---------- 외로움(lonely) ---------- */
+.state-lonely .brows-sad   { display: block; }
+.state-lonely .mouth-smile { display: none; }
+.state-lonely .mouth-sad   { display: block; }
+.state-lonely .fx-lonely   { display: block; }
+.state-lonely #earL        { transform: rotate(14deg); }
+.state-lonely #earR        { transform: rotate(-14deg); }
+.state-lonely #catBody     { animation: breathe 5s ease-in-out infinite; }
+.state-lonely #catTail     { animation-duration: 5s; }
+.fx-lonely .tear { animation: teardrop 2.6s ease-in infinite; transform-box: fill-box; transform-origin: center top; }
+@keyframes teardrop { 0%{opacity:0; transform:translateY(0) scaleY(.6)} 20%{opacity:1} 100%{opacity:0; transform:translateY(22px) scaleY(1)} }
+
+/* ---------- 아픔(sick) ---------- */
+.state-sick .fur          { fill: #C6CCD4; }   /* 혈색이 빠진 톤 */
+.state-sick .blush        { opacity: .15; }
+.state-sick .eyes-open    { display: none; }
+.state-sick .eyes-closed  { display: block; }
+.state-sick .mouth-smile  { display: none; }
+.state-sick .mouth-o      { display: block; }
+.state-sick .fx-sick      { display: block; }
+.state-sick #earL         { transform: rotate(18deg); }
+.state-sick #earR         { transform: rotate(-18deg); }
+.state-sick #catBody      { animation: breathe 6.5s ease-in-out infinite; }
+.state-sick #catTail      { animation: none; transform: rotate(2deg); }
+.fx-sick .sweat { animation: sweatDrop 2.2s ease-in infinite; transform-origin: center top; }
+@keyframes sweatDrop { 0%{opacity:0; transform:translateY(0)} 25%{opacity:1} 100%{opacity:0; transform:translateY(16px)} }
+
+/* 모션 최소화 선호 사용자 배려 */
+@media (prefers-reduced-motion: reduce) {
+  #catBody, #catTail, .eyes-open, #catHead,
+  .fx-hearts .heart, .fx-zzz .zz, .fx-sick .sweat, .fx-alert .bang, .fx-lonely .tear { animation: none !important; }
 }
-.guide-item.lit { border-color: var(--mint); background: var(--mint-soft); }
-.guide-item .g-emoji { font-size: 20px; }
-.guide-item .g-meta strong { display: block; font-size: 13px; }
-.guide-item .g-meta span { font-size: 11.5px; color: var(--ink-mute); }
 
 /* ---------- Care ---------- */
 .care-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
@@ -326,7 +442,8 @@ body {
   .sidebar { display: none; }
   .main { padding: 20px 16px 96px; }
   .page-title { font-size: 23px; }
-  .grid-3, .grid-2, .care-grid, .guide-grid { grid-template-columns: 1fr; }
+  .grid-3, .grid-2, .care-grid { grid-template-columns: 1fr; }
+  .state-picker { grid-template-columns: repeat(3, 1fr); }
   .hero-card { flex-direction: column; text-align: center; }
   .hero-desc { margin: 0 auto; }
   .hero-meta { justify-content: center; }
