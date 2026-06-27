@@ -153,9 +153,10 @@
             <h3>나비의 지금 모습</h3>
             <span class="chip chip-mint">감정 · 건강 실시간</span>
           </div>
-          <p class="muted-sm">AI가 분석한 감정·건강 상태에 따라 나비의 모습이 실시간으로 바뀌어요. 상태를 눌러 미리 볼 수도 있어요.</p>
+          <p class="muted-sm">AI가 나비의 표정·자세·활동 데이터를 실시간으로 분석해 현재 상태를 자동으로 보여줘요.</p>
 
-          <div class="cat-stage state-calm" id="catStage">
+          <div class="cat-stage state-calm analyzing" id="catStage">
+            <div class="ai-scan"></div>
             <svg class="cat-svg" viewBox="0 0 260 248" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="나비 상태 애니메이션">
               <ellipse class="cat-shadow" cx="130" cy="232" rx="66" ry="12"/>
 
@@ -238,13 +239,18 @@
 
             <div class="cat-mood">
               <span id="catMoodEmoji">😊</span>
-              <strong id="catMoodLabel">편안해요</strong>
+              <strong id="catMoodLabel">분석 중…</strong>
             </div>
           </div>
 
-          <p class="cat-desc" id="catDesc"></p>
-
-          <div class="state-picker" id="statePicker"></div>
+          <div class="ai-readout">
+            <div class="ai-readout-head">
+              <span class="ai-status" id="aiStatus"><span class="ai-dot"></span> 나비의 상태를 분석하고 있어요…</span>
+              <span class="ai-conf" id="aiConf"></span>
+            </div>
+            <p class="cat-desc" id="catDesc"></p>
+            <div class="ai-bars" id="aiBars"></div>
+          </div>
         </div>
 
         <div class="card">

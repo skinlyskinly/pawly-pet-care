@@ -128,36 +128,72 @@
   }
 
   /* =========================================================
-     나비 상태 애니메이션 (감정·건강에 따라 모습 변화)
+     나비 상태 — AI 자동 분석 (보호자가 고르지 않음)
+     표정·자세·활동 데이터를 분석해 현재 상태를 추정하고,
+     실시간 모니터링처럼 주기적으로 다시 분석합니다.
      ========================================================= */
-  const stage      = $("#catStage");
-  const moodEmoji  = $("#catMoodEmoji");
-  const moodLabel  = $("#catMoodLabel");
-  const catDesc    = $("#catDesc");
-  const picker     = $("#statePicker");
-  const alertBox   = $("#catAlert");
+  const stage     = $("#catStage");
+  const moodEmoji = $("#catMoodEmoji");
+  const moodLabel = $("#catMoodLabel");
+  const catDesc   = $("#catDesc");
+  const aiStatus  = $("#aiStatus");
+  const aiConf    = $("#aiConf");
+  const aiBars    = $("#aiBars");
+  const alertBox  = $("#catAlert");
 
   const STATE_KEYS = D.catStates.map((s) => s.key);
+  // 건강한 상태가 더 자주 추정되도록 가중치 (실제로는 모델 출력)
+  const WEIGHTS = { calm: 34, happy: 24, sleepy: 18, alert: 12, lonely: 8, sick: 4 };
 
-  function renderStatePicker() {
-    picker.innerHTML = D.catStates
-      .map(
-        (s) => `
-        <button class="state-chip" data-state="${s.key}" title="${s.label}">
-          <span>${s.emoji}</span><small>${s.label}</small>
-        </button>`
-      )
+  function pickState() {
+    const total = STATE_KEYS.reduce((a, k) => a + (WEIGHTS[k] || 1), 0);
+    let r = Math.random() * total;
+    for (const k of STATE_KEYS) {
+      r -= WEIGHTS[k] || 1;
+      if (r <= 0) return k;
+    }
+    return STATE_KEYS[0];
+  }
+
+  // 추정 상태에 높은 신뢰도를 주고 나머지를 후보로 분배 (합 100)
+  function genConfidence(topKey) {
+    const scores = {};
+    const top = 82 + Math.floor(Math.random() * 13); // 82~94%
+    scores[topKey] = top;
+    const others = STATE_KEYS.filter((k) => k !== topKey);
+    const ws = others.map(() => Math.random() + 0.05);
+    const sum = ws.reduce((a, b) => a + b, 0);
+    let used = 0;
+    others.forEach((k, i) => {
+      const v = i === others.length - 1 ? 100 - top - used : Math.max(1, Math.round((100 - top) * ws[i] / sum));
+      scores[k] = v;
+      used += v;
+    });
+    return scores;
+  }
+
+  function renderBars(scores, topKey) {
+    const sorted = STATE_KEYS.map((k) => ({ k, v: scores[k] })).sort((a, b) => b.v - a.v);
+    aiBars.innerHTML = sorted
+      .map(({ k, v }) => {
+        const s = D.catStates.find((x) => x.key === k);
+        return `
+        <div class="ai-bar-row ${k === topKey ? "top" : ""}">
+          <span class="ai-bar-label">${s.emoji} ${s.label}</span>
+          <span class="ai-bar-track"><i style="width:0" data-w="${v}"></i></span>
+          <span class="ai-bar-pct">${v}%</span>
+        </div>`;
+      })
       .join("");
-    $$(".state-chip", picker).forEach((b) =>
-      b.addEventListener("click", () => setCatState(b.dataset.state))
+    requestAnimationFrame(() =>
+      $$("#aiBars i").forEach((i) => (i.style.width = i.dataset.w + "%"))
     );
   }
 
-  function setCatState(key) {
+  // 추정 결과를 화면에 반영 (표정·애니메이션·설명·알림)
+  function applyState(key) {
     const s = D.catStates.find((x) => x.key === key);
     if (!s) return;
-
-    // 상태 클래스 교체 → CSS 가 표정·애니메이션을 전환
     STATE_KEYS.forEach((k) => stage.classList.remove("state-" + k));
     stage.classList.add("state-" + key);
 
@@ -168,14 +204,28 @@
     alertBox.className = "cat-alert tone-" + s.alert.tone;
     alertBox.innerHTML = `<span class="alert-ico">${s.alert.ico}</span><p>${s.alert.text}</p>`;
 
-    $$(".state-chip", picker).forEach((b) =>
-      b.classList.toggle("is-active", b.dataset.state === key)
-    );
-
-    // 전환 시 살짝 튀어오르는 모션
     stage.classList.remove("switching");
     void stage.offsetWidth;
     stage.classList.add("switching");
+  }
+
+  // 한 번의 분석 사이클: "분석 중" → 결과 공개
+  function analyze() {
+    stage.classList.add("analyzing");
+    aiStatus.innerHTML = `<span class="ai-dot"></span> 나비의 상태를 분석하고 있어요…`;
+    aiConf.textContent = "";
+    moodEmoji.textContent = "🔍";
+    moodLabel.textContent = "분석 중…";
+
+    setTimeout(() => {
+      const key = pickState();
+      const scores = genConfidence(key);
+      stage.classList.remove("analyzing");
+      applyState(key);
+      renderBars(scores, key);
+      aiStatus.innerHTML = `<span class="ai-dot live"></span> 실시간 분석 완료`;
+      aiConf.textContent = `신뢰도 ${scores[key]}% · 방금 분석됨`;
+    }, 1500);
   }
 
   /* ---------- 초기 렌더 ---------- */
@@ -186,6 +236,7 @@
   renderInsights();
   renderCare();
   renderChecklist();
-  renderStatePicker();
-  setCatState(D.defaultState || "calm");
+
+  analyze();                 // 진입 시 자동 분석
+  setInterval(analyze, 9000); // 실시간 모니터링처럼 주기적 재분석
 })();

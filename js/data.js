@@ -64,9 +64,8 @@ window.PAWLY = {
     { text: "저녁 사료 급여", done: false },
   ],
 
-  /* ----- 감정·건강 상태별 나비의 모습 -----
+  /* ----- 감정·건강 상태별 나비의 모습 (AI 자동 분석 결과) -----
      key 는 .cat-stage 의 상태 클래스(state-<key>)와 일치 */
-  defaultState: "calm",
   catStates: [
     { key: "calm",   emoji: "😊", label: "편안해요",
       desc: "나비는 지금 안정적이에요. 수염과 귀가 부드럽게 풀려 있고 호흡이 일정해요.",

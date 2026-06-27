@@ -248,7 +248,8 @@ body {
 .cat-stage.switching .cat-svg { animation: stageHop .45s ease; }
 @keyframes stageHop { 0%{transform:translateY(0)} 35%{transform:translateY(-12px)} 100%{transform:translateY(0)} }
 
-.cat-svg { width: 250px; max-width: 78%; height: auto; display: block; overflow: visible; }
+.cat-svg { width: 250px; max-width: 78%; height: auto; display: block; overflow: visible; transition: opacity .3s ease; }
+.cat-stage.analyzing .cat-svg { opacity: .82; }
 
 .cat-mood {
   display: flex; align-items: center; gap: 9px;
@@ -258,26 +259,40 @@ body {
 .cat-mood span { font-size: 20px; }
 .cat-mood strong { font-size: 15px; letter-spacing: -.01em; }
 
-.cat-desc {
-  font-size: 14.5px; color: var(--ink-soft); text-align: center;
-  margin: 16px auto 4px; max-width: 460px; min-height: 42px;
-}
+/* ----- AI 스캔 라인 (분석 중에만 표시) ----- */
+.ai-scan { display: none; position: absolute; left: 0; right: 0; top: 0; height: 34px;
+  background: linear-gradient(180deg, rgba(74,144,226,0) 0%, rgba(74,144,226,.28) 50%, rgba(74,144,226,0) 100%);
+  pointer-events: none; }
+.cat-stage.analyzing .ai-scan { display: block; animation: scan 1.5s ease-in-out infinite; }
+@keyframes scan { 0%{transform:translateY(-10%)} 100%{transform:translateY(640%)} }
 
-/* ----- state picker ----- */
-.state-picker {
-  display: grid; grid-template-columns: repeat(6, 1fr); gap: 9px;
-  margin-top: 14px;
-}
-.state-chip {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 12px 6px; cursor: pointer;
-  background: var(--surface-2); border: 1.5px solid var(--line);
-  border-radius: var(--radius-md); transition: .16s ease;
-  font: 500 11.5px var(--font); color: var(--ink-soft);
-}
-.state-chip span { font-size: 22px; }
-.state-chip:hover { border-color: var(--blue); transform: translateY(-2px); }
-.state-chip.is-active { border-color: var(--mint); background: var(--mint-soft); color: #1F9C84; font-weight: 600; }
+/* ----- AI 분석 결과 패널 ----- */
+.ai-readout { margin-top: 18px; }
+.ai-readout-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+.ai-status { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
+.ai-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--blue); animation: dotPulse 1s ease-in-out infinite; }
+.ai-dot.live { background: var(--mint); }
+@keyframes dotPulse { 0%,100%{opacity:.35; transform:scale(.8)} 50%{opacity:1; transform:scale(1)} }
+.ai-conf { font-size: 12.5px; color: var(--ink-mute); }
+
+.cat-desc { font-size: 14.5px; color: var(--ink-soft); text-align: center; margin: 14px auto 16px; max-width: 460px; min-height: 42px; }
+
+.ai-bars { display: flex; flex-direction: column; gap: 9px; }
+.ai-bar-row { display: grid; grid-template-columns: 92px 1fr 42px; align-items: center; gap: 12px; opacity: .6; transition: opacity .3s ease; }
+.ai-bar-row.top { opacity: 1; }
+.ai-bar-label { font-size: 13px; white-space: nowrap; }
+.ai-bar-track { height: 9px; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+.ai-bar-track i { display: block; height: 100%; border-radius: 999px; background: #C4D2E6; transition: width .9s ease; }
+.ai-bar-row.top .ai-bar-track i { background: linear-gradient(90deg, var(--blue), var(--mint)); }
+.ai-bar-pct { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); text-align: right; }
+
+/* ----- alert box ----- */
+.cat-alert { display: flex; align-items: center; gap: 13px; padding: 16px 18px; border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--surface-2); }
+.cat-alert .alert-ico { font-size: 22px; flex-shrink: 0; }
+.cat-alert p { font-size: 14px; color: var(--ink-soft); }
+.cat-alert.tone-ok   { background: var(--mint-soft); border-color: #BCEBE0; }
+.cat-alert.tone-warn { background: #FFF6E6; border-color: #FAE2B0; }
+.cat-alert.tone-bad  { background: #FDECEC; border-color: #F6C9C9; }
 
 /* ----- alert box ----- */
 .cat-alert { display: flex; align-items: center; gap: 13px; padding: 16px 18px; border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--surface-2); }
@@ -443,7 +458,7 @@ body {
   .main { padding: 20px 16px 96px; }
   .page-title { font-size: 23px; }
   .grid-3, .grid-2, .care-grid { grid-template-columns: 1fr; }
-  .state-picker { grid-template-columns: repeat(3, 1fr); }
+  .ai-bar-row { grid-template-columns: 84px 1fr 40px; }
   .hero-card { flex-direction: column; text-align: center; }
   .hero-desc { margin: 0 auto; }
   .hero-meta { justify-content: center; }
