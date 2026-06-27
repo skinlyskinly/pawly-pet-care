@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#F4F8FB" />
+  <meta name="description" content="AI 학습 기반 맞춤 관리와 감정 인식을 결합한 반려동물 돌봄 앱" />
+  <title>Pawly · AI 반려동물 돌봄</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- ===== Sidebar ===== -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">🐾</div>
+        <div class="brand-name">Pawly</div>
+      </div>
+      <nav class="nav" aria-label="주요 메뉴">
+        <button class="nav-item is-active" data-view="home">
+          <span class="nav-ico">🏠</span><span>홈</span>
+        </button>
+        <button class="nav-item" data-view="emotion">
+          <span class="nav-ico">💞</span><span>감정 분석</span>
+        </button>
+        <button class="nav-item" data-view="gesture">
+          <span class="nav-ico">✋</span><span>제스처 교감</span>
+        </button>
+        <button class="nav-item" data-view="care">
+          <span class="nav-ico">🤖</span><span>AI 케어</span>
+        </button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="pet-mini">
+          <div class="pet-avatar">🐱</div>
+          <div class="pet-mini-meta">
+            <strong>나비</strong>
+            <span>코리안숏헤어 · 3살</span>
+          </div>
+          <span class="dot-online" title="실시간 연결됨"></span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== Main ===== -->
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">좋은 오후예요, 보호자님 👋</p>
+          <h1 class="page-title" id="pageTitle">나비의 하루</h1>
+        </div>
+        <div class="topbar-right">
+          <div class="status-pill">
+            <span class="dot-online"></span> 실시간 모니터링 중
+          </div>
+          <div class="avatar-lg">🐱</div>
+        </div>
+      </header>
+
+      <!-- ============ HOME ============ -->
+      <section class="view is-active" id="view-home">
+        <!-- Emotion hero -->
+        <div class="card hero-card">
+          <div class="hero-left">
+            <span class="chip chip-mint">AI 감정 분석</span>
+            <h2 class="hero-emotion"><span id="emotionEmoji">😊</span> <span id="emotionLabel">편안해요</span></h2>
+            <p class="hero-desc" id="emotionDesc">나비는 지금 안정적이고 기분이 좋은 상태예요. 표정과 수염, 귀의 움직임이 평소보다 부드러워요.</p>
+            <div class="hero-meta">
+              <span>신뢰도 <strong id="emotionConf">92%</strong></span>
+              <span class="divider-dot"></span>
+              <span>방금 업데이트됨</span>
+            </div>
+          </div>
+          <div class="hero-right">
+            <div class="emotion-ring" id="emotionRing">
+              <div class="emotion-ring-inner">
+                <span id="ringEmoji">😊</span>
+                <small>현재 감정</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="grid-3">
+          <div class="card stat-card">
+            <div class="stat-head"><span class="stat-ico ico-blue">❤️</span><span>건강 점수</span></div>
+            <div class="stat-value">87<small>/100</small></div>
+            <div class="bar"><i style="width:87%"></i></div>
+            <p class="stat-note">활력 지표가 안정적이에요</p>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-head"><span class="stat-ico ico-mint">🏃</span><span>활동량</span></div>
+            <div class="stat-value">68<small>%</small></div>
+            <div class="bar bar-mint"><i style="width:68%"></i></div>
+            <p class="stat-note">오늘 목표의 68% 달성</p>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-head"><span class="stat-ico ico-blue">😴</span><span>수면</span></div>
+            <div class="stat-value">9.2<small>시간</small></div>
+            <div class="bar"><i style="width:78%"></i></div>
+            <p class="stat-note">충분히 휴식했어요</p>
+          </div>
+        </div>
+
+        <!-- Activity chart + AI tip -->
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <h3>주간 활동량</h3>
+              <span class="chip chip-soft">최근 7일</span>
+            </div>
+            <div class="chart" id="weekChart" aria-hidden="true"></div>
+          </div>
+          <div class="card ai-tip-card">
+            <div class="card-head">
+              <h3>오늘의 AI 추천</h3>
+              <span class="chip chip-mint">맞춤 케어</span>
+            </div>
+            <ul class="tip-list" id="tipList"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ EMOTION ============ -->
+      <section class="view" id="view-emotion">
+        <div class="card">
+          <div class="card-head">
+            <h3>감정 분포</h3>
+            <span class="chip chip-soft">AI 학습 데이터 기반</span>
+          </div>
+          <div class="emotion-bars" id="emotionBars"></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><h3>감정 타임라인</h3></div>
+            <ul class="timeline" id="emotionTimeline"></ul>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>AI가 학습한 나비의 패턴</h3></div>
+            <ul class="insight-list" id="insightList"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ GESTURE ============ -->
+      <section class="view" id="view-gesture">
+        <div class="grid-2 gesture-grid">
+          <div class="card cam-card">
+            <div class="card-head">
+              <h3>손동작 교감</h3>
+              <span class="chip chip-mint">MediaPipe AI</span>
+            </div>
+            <p class="muted-sm">카메라 앞에서 손동작을 보여주세요. AI가 인식해 나비가 반응해요.</p>
+            <div class="cam-wrap">
+              <video id="cam" autoplay playsinline muted></video>
+              <canvas id="overlay"></canvas>
+              <div class="cam-placeholder" id="camPlaceholder">
+                <span class="cam-ico">📷</span>
+                <p>카메라를 켜고 손동작을 시작하세요</p>
+              </div>
+              <div class="cam-badge" id="gestureBadge" hidden>
+                <span id="gestureBadgeIco">✋</span>
+                <span id="gestureBadgeText">손동작 대기 중</span>
+              </div>
+            </div>
+            <div class="cam-controls">
+              <button class="btn btn-primary" id="camBtn">카메라 켜기</button>
+              <span class="cam-status" id="camStatus">대기 중</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>나비의 반응</h3></div>
+            <div class="pet-reaction">
+              <div class="pet-reaction-face" id="petFace">🐱</div>
+              <p class="pet-reaction-text" id="petReaction">손동작을 기다리고 있어요…</p>
+            </div>
+            <div class="gesture-guide">
+              <p class="guide-title">인식 가능한 손동작</p>
+              <div class="guide-grid" id="guideGrid"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CARE ============ -->
+      <section class="view" id="view-care">
+        <div class="card">
+          <div class="card-head">
+            <h3>AI 맞춤 케어 플랜</h3>
+            <span class="chip chip-mint">매일 자동 업데이트</span>
+          </div>
+          <div class="care-grid" id="careGrid"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>오늘의 돌봄 체크리스트</h3></div>
+          <ul class="checklist" id="checkList"></ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <nav class="mobile-nav" aria-label="모바일 메뉴">
+    <button class="m-nav is-active" data-view="home"><span>🏠</span><small>홈</small></button>
+    <button class="m-nav" data-view="emotion"><span>💞</span><small>감정</small></button>
+    <button class="m-nav" data-view="gesture"><span>✋</span><small>교감</small></button>
+    <button class="m-nav" data-view="care"><span>🤖</span><small>케어</small></button>
+  </nav>
+
+  <script src="js/data.js"></script>
+  <script type="module" src="js/gesture.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
