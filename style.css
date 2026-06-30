@@ -337,7 +337,6 @@ textarea::placeholder, input::placeholder { color: #BBB4A2; }
 /* ===================== Toast ===================== */
 .toast {
   position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom));
-  transform: transl(-50%, 20px); translate: -50% 0;
   translate: -50% 8px;
   background: var(--ink); color: #fff;
   font-size: 14px; font-weight: 500;
