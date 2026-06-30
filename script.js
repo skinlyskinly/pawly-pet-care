@@ -76,16 +76,23 @@ function toast(msg) {
 }
 
 /* ---------------- Navigation ---------------- */
+const VIEWS = ["home", "check", "camera", "records", "profile"];
+
 function showView(name) {
+  if (!VIEWS.includes(name)) name = "home";
   document.querySelectorAll(".view").forEach((v) => v.classList.toggle("is-active", v.id === `view-${name}`));
   document.querySelectorAll(".nav__link").forEach((b) => b.classList.toggle("is-active", b.dataset.view === name));
   window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  const hash = name === "home" ? "" : "#" + name;
+  if (location.hash !== hash) history.replaceState(null, "", hash || location.pathname + location.search);
   if (name === "home") renderHome();
   if (name === "records") renderRecords();
   if (name === "profile") fillProfileForm();
   if (name === "check") prefillCheck();
   if (name !== "camera") stopCamera();
 }
+
+window.addEventListener("hashchange", () => showView(location.hash.slice(1) || "home"));
 
 document.addEventListener("click", (e) => {
   const trigger = e.target.closest("[data-view]");
@@ -534,5 +541,5 @@ document.getElementById("camera-save").addEventListener("click", () => {
 });
 
 /* ---------------- Init ---------------- */
-renderHome();
+showView(location.hash.slice(1) || "home");
 window.addEventListener("beforeunload", stopCamera);
